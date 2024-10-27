@@ -1,14 +1,13 @@
 package com.ansoncht.catfoodtracker.user;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.index.Indexed;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -48,7 +47,8 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String username, String email, String firstName, String lastName, String password) {
         this.username = username;
@@ -117,19 +117,19 @@ public class User {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         User user = (User) o;
         return Objects.equals(this.id, user.id);
     }
 
     @Override
     public String toString() {
-        return "User{" + "id='" + this.id + '\'' + ", username='" + this.username + '\''
-                + ", email='" + this.email + '\'' + ", firstName='" + this.firstName + '\''
-                + ", lastName='" + this.lastName + '\'' + ", createdAt=" + this.createdAt
-                + ", updatedAt=" + this.updatedAt + '}';
+        return "User{" + "id='" + this.id + '\'' + ", username='" + this.username + '\'' + ", email='" + this.email + '\'' + ", firstName='" + this.firstName + '\'' + ", lastName='" + this.lastName + '\'' + ", createdAt=" + this.createdAt + ", updatedAt=" + this.updatedAt + '}';
     }
+
 }

@@ -1,14 +1,14 @@
 package com.ansoncht.catfoodtracker.user.dto;
 
+import com.ansoncht.catfoodtracker.user.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.util.Objects;
 
-import com.ansoncht.catfoodtracker.user.User;
-
 public class UserRegistrationDTO {
+
     @NotBlank
     @Size(max = 50)
     private String username;
@@ -30,10 +30,10 @@ public class UserRegistrationDTO {
     @Size(min = 8, max = 100)
     private String password;
 
-    public UserRegistrationDTO() {}
+    public UserRegistrationDTO() {
+    }
 
-    public UserRegistrationDTO(String username, String email, String firstName, String lastName,
-            String password) {
+    public UserRegistrationDTO(String username, String email, String firstName, String lastName, String password) {
         this.username = username;
         this.email = email;
         this.firstName = firstName;
@@ -77,10 +77,8 @@ public class UserRegistrationDTO {
         this.lastName = lastName;
     }
 
-
     public User toUser(String encryptedPassword) {
-        return new User(this.username, this.firstName, this.lastName, this.email,
-                encryptedPassword);
+        return new User(this.username, this.email, this.firstName, this.lastName, encryptedPassword);
     }
 
     @Override
@@ -90,19 +88,18 @@ public class UserRegistrationDTO {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!(obj instanceof UserRegistrationDTO))
+        }
+        if (!(obj instanceof UserRegistrationDTO other)) {
             return false;
-        UserRegistrationDTO other = (UserRegistrationDTO) obj;
-        return Objects.equals(this.username, other.username)
-                && Objects.equals(this.email, other.email);
+        }
+        return Objects.equals(this.username, other.username) && Objects.equals(this.email, other.email);
     }
 
     @Override
     public String toString() {
-        return "UserRegistrationDTO{" + "username='" + ", email='" + this.email + '\''
-                + this.username + '\'' + ", firstName='" + this.firstName + '\'' + ", lastName='"
-                + this.lastName + '\'' + ", password='[PROTECTED]'" + '}';
+        return "UserRegistrationDTO{" + "username='" + ", email='" + this.email + '\'' + this.username + '\'' + ", firstName='" + this.firstName + '\'' + ", lastName='" + this.lastName + '\'' + ", password='[PROTECTED]'" + '}';
     }
+
 }

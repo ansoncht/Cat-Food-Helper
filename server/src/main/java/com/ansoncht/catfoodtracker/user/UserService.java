@@ -1,38 +1,41 @@
 package com.ansoncht.catfoodtracker.user;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.ansoncht.catfoodtracker.user.dto.UserDTO;
 import com.ansoncht.catfoodtracker.user.dto.UserLoginDTO;
 import com.ansoncht.catfoodtracker.user.dto.UserRegistrationDTO;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+public class UserService implements UserDetailsService {
+
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     public UserDTO registerUser(UserRegistrationDTO userRegistrationDTO) {
         logger.info("Attempting to register new user: {}", userRegistrationDTO.getUsername());
 
         if (userRepository.existsByUsername(userRegistrationDTO.getUsername())) {
-            logger.warn("Registration failed: Username already exists: {}",
-                    userRegistrationDTO.getUsername());
+            logger.warn("Registration failed: Username already exists: {}", userRegistrationDTO.getUsername());
+
             throw new RuntimeException("Username already exists");
         }
 
         if (userRepository.existsByEmail(userRegistrationDTO.getEmail())) {
-            logger.warn("Registration failed: Email already exists: {}",
-                    userRegistrationDTO.getEmail());
+            logger.warn("Registration failed: Email already exists: {}", userRegistrationDTO.getEmail());
+
             throw new RuntimeException("Email already exists");
         }
 
@@ -48,17 +51,14 @@ public class UserService {
     public UserDTO authenticateUser(UserLoginDTO userLoginDTO) {
         logger.info("Attempting login for user: {}", userLoginDTO.getUsernameOrEmail());
 
-        User user = this.userRepository.findByUsernameOrEmail(userLoginDTO.getUsernameOrEmail(),
-                userLoginDTO.getUsernameOrEmail()).orElseThrow(() -> {
-                    logger.warn("Login failed: User not found: {}",
-                            userLoginDTO.getUsernameOrEmail());
+        User user = this.userRepository.findByUsernameOrEmail(userLoginDTO.getUsernameOrEmail(), userLoginDTO.getUsernameOrEmail()).orElseThrow(() -> {
+            logger.warn("Login failed: User not found: {}", userLoginDTO.getUsernameOrEmail());
 
-                    return new RuntimeException("Invalid username or email");
-                });
+            return new RuntimeException("Invalid username or email");
+        });
 
         if (!verifyPassword(userLoginDTO.getPassword(), user.getPassword())) {
-            logger.warn("Login failed: Incorrect password for user: {}",
-                    userLoginDTO.getUsernameOrEmail());
+            logger.warn("Login failed: Incorrect password for user: {}", userLoginDTO.getUsernameOrEmail());
 
             throw new RuntimeException("Invalid password");
         }
@@ -69,15 +69,31 @@ public class UserService {
 
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+        logger.info("Attempting to load user: {}", usernameOrEmail);
+
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow(() -> {
+            logger.warn("User not found: {}", usernameOrEmail);
+
+            return new UsernameNotFoundException("User not found with username or email: " + usernameOrEmail);
+        });
+
+        logger.info("User loaded successfully: {}", user.getUsername());
+
+        return org.springframework.security.core.userdetails.User.builder().username(user.getUsername()).password(user.getPassword()).roles("USER").build();
+    }
+
     private String encryptPassword(String rawPassword) {
         logger.debug("Encrypting password");
 
-        return this.bCryptPasswordEncoder.encode(rawPassword);
+        return this.passwordEncoder.encode(rawPassword);
     }
 
     private boolean verifyPassword(String rawPassword, String encodedPassword) {
         logger.debug("Verifying password");
 
-        return this.bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
+        return this.passwordEncoder.matches(rawPassword, encodedPassword);
     }
+
 }
