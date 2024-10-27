@@ -1,5 +1,6 @@
 package com.ansoncht.catfoodtracker.user.dto;
 
+import com.ansoncht.catfoodtracker.user.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -7,9 +8,8 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import com.ansoncht.catfoodtracker.user.User;
-
 public class UserDTO {
+
     @NotBlank
     private String id;
 
@@ -34,10 +34,10 @@ public class UserDTO {
 
     private LocalDateTime updatedAt;
 
-    public UserDTO() {}
+    public UserDTO() {
+    }
 
-    public UserDTO(String id, String username, String email, String firstName, String lastName,
-            LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public UserDTO(String id, String username, String email, String firstName, String lastName, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -45,6 +45,10 @@ public class UserDTO {
         this.lastName = lastName;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public static UserDTO fromUser(User user) {
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getCreatedAt(), user.getUpdatedAt());
     }
 
     public String getId() {
@@ -103,11 +107,6 @@ public class UserDTO {
         this.updatedAt = updatedAt;
     }
 
-    public static UserDTO fromUser(User user) {
-        return new UserDTO(user.getId(), user.getUsername(), user.getFirstName(),
-                user.getLastName(), user.getEmail(), user.getCreatedAt(), user.getUpdatedAt());
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(this.id, this.username, this.email);
@@ -115,21 +114,19 @@ public class UserDTO {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         UserDTO userDTO = (UserDTO) o;
-        return Objects.equals(this.id, userDTO.id)
-                && Objects.equals(this.username, userDTO.username)
-                && Objects.equals(this.email, userDTO.email);
+        return Objects.equals(this.id, userDTO.id) && Objects.equals(this.username, userDTO.username) && Objects.equals(this.email, userDTO.email);
     }
 
     @Override
     public String toString() {
-        return "UserDTO{" + "id='" + this.id + '\'' + ", username='" + this.username + '\''
-                + ", email='" + this.email + '\'' + ", firstName='" + this.firstName + '\''
-                + ", lastName='" + this.lastName + '\'' + ", createdAt=" + this.createdAt
-                + ", updatedAt=" + this.updatedAt + '}';
+        return "UserDTO{" + "id='" + this.id + '\'' + ", username='" + this.username + '\'' + ", email='" + this.email + '\'' + ", firstName='" + this.firstName + '\'' + ", lastName='" + this.lastName + '\'' + ", createdAt=" + this.createdAt + ", updatedAt=" + this.updatedAt + '}';
     }
+
 }

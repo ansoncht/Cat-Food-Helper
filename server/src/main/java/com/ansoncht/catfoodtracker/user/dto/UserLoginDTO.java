@@ -1,10 +1,12 @@
 package com.ansoncht.catfoodtracker.user.dto;
 
-import java.util.Objects;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.Objects;
+
 public class UserLoginDTO {
+
     @NotBlank
     @Size(max = 100)
     private String usernameOrEmail;
@@ -13,7 +15,8 @@ public class UserLoginDTO {
     @Size(min = 8, max = 100)
     private String password;
 
-    public UserLoginDTO() {}
+    public UserLoginDTO() {
+    }
 
     public UserLoginDTO(String usernameOrEmail, String password) {
         this.usernameOrEmail = usernameOrEmail;
@@ -43,17 +46,18 @@ public class UserLoginDTO {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!(obj instanceof UserLoginDTO))
+        }
+        if (!(obj instanceof UserLoginDTO other)) {
             return false;
-        UserLoginDTO other = (UserLoginDTO) obj;
+        }
         return Objects.equals(this.usernameOrEmail, other.usernameOrEmail);
     }
 
     @Override
     public String toString() {
-        return "UserLoginDTO{" + "usernameOrEmail='" + this.usernameOrEmail + '\''
-                + ", password='[PROTECTED]'" + '}';
+        return "UserLoginDTO{" + "usernameOrEmail='" + this.usernameOrEmail + '\'' + ", password='[PROTECTED]'" + '}';
     }
+
 }
