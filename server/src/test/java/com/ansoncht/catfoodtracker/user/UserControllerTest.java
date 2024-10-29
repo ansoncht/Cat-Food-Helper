@@ -1,26 +1,26 @@
 package com.ansoncht.catfoodtracker.user;
 
-import com.ansoncht.catfoodtracker.config.TestSecurityConfig;
-import com.ansoncht.catfoodtracker.user.dto.UserDTO;
-import com.ansoncht.catfoodtracker.user.dto.UserLoginDTO;
-import com.ansoncht.catfoodtracker.user.dto.UserRegistrationDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.LocalDateTime;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.ansoncht.catfoodtracker.config.TestSecurityConfig;
+import com.ansoncht.catfoodtracker.user.dto.UserDTO;
+import com.ansoncht.catfoodtracker.user.dto.UserLoginDTO;
+import com.ansoncht.catfoodtracker.user.dto.UserRegistrationDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(UserController.class)
 @Import(TestSecurityConfig.class)
@@ -34,9 +34,6 @@ public class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    @MockBean
-    private UserRepository userRepository;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -48,7 +45,17 @@ public class UserControllerTest {
 
         when(userService.registerUser(any(UserRegistrationDTO.class))).thenReturn(expected);
 
-        mockMvc.perform(post("/api/v1/user/signup").contentType(MediaType.APPLICATION_JSON).content(this.objectMapper.writeValueAsString(req))).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(expected.getId())).andExpect(jsonPath("$.username").value(expected.getUsername())).andExpect(jsonPath("$.email").value(expected.getEmail())).andExpect(jsonPath("$.firstName").value(expected.getFirstName())).andExpect(jsonPath("$.lastName").value(expected.getLastName())).andExpect(jsonPath("$.createdAt").value(expected.getCreatedAt().toString())).andExpect(jsonPath("$.updatedAt").value(expected.getUpdatedAt().toString()));
+        mockMvc.perform(post("/api/v1/user/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(expected.getId()))
+                .andExpect(jsonPath("$.username").value(expected.getUsername()))
+                .andExpect(jsonPath("$.email").value(expected.getEmail()))
+                .andExpect(jsonPath("$.firstName").value(expected.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(expected.getLastName()))
+                .andExpect(jsonPath("$.createdAt").value(expected.getCreatedAt().toString()))
+                .andExpect(jsonPath("$.updatedAt").value(expected.getUpdatedAt().toString()));
 
         verify(userService).registerUser(any(UserRegistrationDTO.class));
     }
@@ -58,7 +65,10 @@ public class UserControllerTest {
 
         UserRegistrationDTO req = new UserRegistrationDTO("test", "test@gmail.com", "test", "test", "test");
 
-        mockMvc.perform(post("/api/v1/user/signup").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req))).andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/v1/user/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -67,7 +77,10 @@ public class UserControllerTest {
 
         when(userService.registerUser(any(UserRegistrationDTO.class))).thenThrow(new RuntimeException("Test RuntimeException"));
 
-        mockMvc.perform(post("/api/v1/user/signup").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req))).andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/v1/user/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
 
         verify(userService).registerUser(any(UserRegistrationDTO.class));
     }
@@ -80,7 +93,17 @@ public class UserControllerTest {
 
         when(userService.authenticateUser(any(UserLoginDTO.class))).thenReturn(expected);
 
-        mockMvc.perform(post("/api/v1/user/signin").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req))).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(expected.getId())).andExpect(jsonPath("$.username").value(expected.getUsername())).andExpect(jsonPath("$.email").value(expected.getEmail())).andExpect(jsonPath("$.firstName").value(expected.getFirstName())).andExpect(jsonPath("$.lastName").value(expected.getLastName())).andExpect(jsonPath("$.createdAt").value(expected.getCreatedAt().toString())).andExpect(jsonPath("$.updatedAt").value(expected.getUpdatedAt().toString()));
+        mockMvc.perform(post("/api/v1/user/signin")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(expected.getId()))
+                .andExpect(jsonPath("$.username").value(expected.getUsername()))
+                .andExpect(jsonPath("$.email").value(expected.getEmail()))
+                .andExpect(jsonPath("$.firstName").value(expected.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(expected.getLastName()))
+                .andExpect(jsonPath("$.createdAt").value(expected.getCreatedAt().toString()))
+                .andExpect(jsonPath("$.updatedAt").value(expected.getUpdatedAt().toString()));
 
         verify(userService).authenticateUser(any(UserLoginDTO.class));
     }
@@ -89,16 +112,23 @@ public class UserControllerTest {
     void testSignIn_InvalidRequest_ShouldFailWithBadRequest() throws Exception {
         UserLoginDTO req = new UserLoginDTO("test", "test");
 
-        mockMvc.perform(post("/api/v1/user/signin").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req))).andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/v1/user/signin")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void testSignUp_IncorrectPassword_ShouldFailWithBadRequest() throws Exception {
         UserLoginDTO req = new UserLoginDTO("test", "testPassword");
 
-        when(userService.authenticateUser(any(UserLoginDTO.class))).thenThrow(new RuntimeException("Test RuntimeException"));
+        when(userService.authenticateUser(any(UserLoginDTO.class)))
+                .thenThrow(new RuntimeException("Test RuntimeException"));
 
-        mockMvc.perform(post("/api/v1/user/signin").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(req))).andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/v1/user/signin")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
 
         verify(userService).authenticateUser(any(UserLoginDTO.class));
     }
