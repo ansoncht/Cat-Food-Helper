@@ -1,26 +1,27 @@
 package com.ansoncht.catfoodtracker.user;
 
-import java.time.LocalDateTime;
-
+import com.ansoncht.catfoodtracker.config.TestSecurityConfig;
+import com.ansoncht.catfoodtracker.security.JwtService;
+import com.ansoncht.catfoodtracker.user.dto.UserDTO;
+import com.ansoncht.catfoodtracker.user.dto.UserLoginDTO;
+import com.ansoncht.catfoodtracker.user.dto.UserRegistrationDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.ansoncht.catfoodtracker.config.TestSecurityConfig;
-import com.ansoncht.catfoodtracker.user.dto.UserDTO;
-import com.ansoncht.catfoodtracker.user.dto.UserLoginDTO;
-import com.ansoncht.catfoodtracker.user.dto.UserRegistrationDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(UserController.class)
 @Import(TestSecurityConfig.class)
@@ -34,6 +35,9 @@ public class UserControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private JwtService jwtService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -46,16 +50,16 @@ public class UserControllerTest {
         when(userService.registerUser(any(UserRegistrationDTO.class))).thenReturn(expected);
 
         mockMvc.perform(post("/api/v1/user/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(expected.getId()))
-                .andExpect(jsonPath("$.username").value(expected.getUsername()))
-                .andExpect(jsonPath("$.email").value(expected.getEmail()))
-                .andExpect(jsonPath("$.firstName").value(expected.getFirstName()))
-                .andExpect(jsonPath("$.lastName").value(expected.getLastName()))
-                .andExpect(jsonPath("$.createdAt").value(expected.getCreatedAt().toString()))
-                .andExpect(jsonPath("$.updatedAt").value(expected.getUpdatedAt().toString()));
+                .andExpect(jsonPath("$.user.id").value(expected.getId()))
+                .andExpect(jsonPath("$.user.username").value(expected.getUsername()))
+                .andExpect(jsonPath("$.user.email").value(expected.getEmail()))
+                .andExpect(jsonPath("$.user.firstName").value(expected.getFirstName()))
+                .andExpect(jsonPath("$.user.lastName").value(expected.getLastName()))
+                .andExpect(jsonPath("$.user.createdAt").value(expected.getCreatedAt().toString()))
+                .andExpect(jsonPath("$.user.updatedAt").value(expected.getUpdatedAt().toString()));
 
         verify(userService).registerUser(any(UserRegistrationDTO.class));
     }
@@ -66,8 +70,8 @@ public class UserControllerTest {
         UserRegistrationDTO req = new UserRegistrationDTO("test", "test@gmail.com", "test", "test", "test");
 
         mockMvc.perform(post("/api/v1/user/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -78,8 +82,8 @@ public class UserControllerTest {
         when(userService.registerUser(any(UserRegistrationDTO.class))).thenThrow(new RuntimeException("Test RuntimeException"));
 
         mockMvc.perform(post("/api/v1/user/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
 
         verify(userService).registerUser(any(UserRegistrationDTO.class));
@@ -94,16 +98,16 @@ public class UserControllerTest {
         when(userService.authenticateUser(any(UserLoginDTO.class))).thenReturn(expected);
 
         mockMvc.perform(post("/api/v1/user/signin")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(expected.getId()))
-                .andExpect(jsonPath("$.username").value(expected.getUsername()))
-                .andExpect(jsonPath("$.email").value(expected.getEmail()))
-                .andExpect(jsonPath("$.firstName").value(expected.getFirstName()))
-                .andExpect(jsonPath("$.lastName").value(expected.getLastName()))
-                .andExpect(jsonPath("$.createdAt").value(expected.getCreatedAt().toString()))
-                .andExpect(jsonPath("$.updatedAt").value(expected.getUpdatedAt().toString()));
+                .andExpect(jsonPath("$.user.id").value(expected.getId()))
+                .andExpect(jsonPath("$.user.username").value(expected.getUsername()))
+                .andExpect(jsonPath("$.user.email").value(expected.getEmail()))
+                .andExpect(jsonPath("$.user.firstName").value(expected.getFirstName()))
+                .andExpect(jsonPath("$.user.lastName").value(expected.getLastName()))
+                .andExpect(jsonPath("$.user.createdAt").value(expected.getCreatedAt().toString()))
+                .andExpect(jsonPath("$.user.updatedAt").value(expected.getUpdatedAt().toString()));
 
         verify(userService).authenticateUser(any(UserLoginDTO.class));
     }
@@ -113,8 +117,8 @@ public class UserControllerTest {
         UserLoginDTO req = new UserLoginDTO("test", "test");
 
         mockMvc.perform(post("/api/v1/user/signin")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -124,10 +128,12 @@ public class UserControllerTest {
 
         when(userService.authenticateUser(any(UserLoginDTO.class)))
                 .thenThrow(new RuntimeException("Test RuntimeException"));
+        when(userService.authenticateUser(any(UserLoginDTO.class)))
+                .thenThrow(new RuntimeException("Test RuntimeException"));
 
         mockMvc.perform(post("/api/v1/user/signin")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
 
         verify(userService).authenticateUser(any(UserLoginDTO.class));
