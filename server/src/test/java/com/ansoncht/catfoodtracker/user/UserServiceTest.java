@@ -33,7 +33,7 @@ public class UserServiceTest {
     @BeforeEach
     public void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
-        userService = new UserService(mockUserRepository);
+        this.userService = new UserService(mockUserRepository);
 
     }
 
@@ -52,7 +52,7 @@ public class UserServiceTest {
         when(mockUserRepository.existsByUsername(req.getUsername())).thenReturn(false);
         when(mockUserRepository.save(expected)).thenReturn(expected);
 
-        UserDTO actual = userService.registerUser(req);
+        UserDTO actual = this.userService.registerUser(req);
 
         assertNotNull(actual);
         assertEquals("Response ID: ", expected.getId(), actual.getId());
@@ -64,7 +64,6 @@ public class UserServiceTest {
         verify(mockUserRepository).save(Mockito.any(User.class));
         verify(mockUserRepository).existsByEmail(req.getEmail());
         verify(mockUserRepository).existsByUsername(req.getUsername());
-        verify(mockUserRepository).save(Mockito.any(User.class));
     }
 
     @Test
@@ -101,7 +100,7 @@ public class UserServiceTest {
 
         when(mockUserRepository.findByUsernameOrEmail(req.getUsernameOrEmail(), req.getUsernameOrEmail())).thenReturn(Optional.of(expected));
 
-        UserDTO actual = userService.authenticateUser(req);
+        UserDTO actual = this.userService.authenticateUser(req);
 
         assertNotNull(actual);
         assertEquals("Response ID: ", actual.getId(), expected.getId());
@@ -119,7 +118,7 @@ public class UserServiceTest {
 
         when(mockUserRepository.findByUsernameOrEmail(req.getUsernameOrEmail(), req.getUsernameOrEmail())).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.authenticateUser(req));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> this.userService.authenticateUser(req));
         assertNotNull(exception.getMessage());
 
         verify(mockUserRepository).findByUsernameOrEmail(req.getUsernameOrEmail(), req.getUsernameOrEmail());
@@ -132,7 +131,7 @@ public class UserServiceTest {
 
         when(mockUserRepository.findByUsernameOrEmail(req.getUsernameOrEmail(), req.getUsernameOrEmail())).thenReturn(Optional.of(expected));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.authenticateUser(req));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> this.userService.authenticateUser(req));
         assertNotNull(exception.getMessage());
 
         verify(mockUserRepository).findByUsernameOrEmail(req.getUsernameOrEmail(), req.getUsernameOrEmail());
@@ -144,7 +143,7 @@ public class UserServiceTest {
 
         when(mockUserRepository.findByUsernameOrEmail(expected.getUsername(), expected.getUsername())).thenReturn(Optional.of(expected));
 
-        UserDetails actual = userService.loadUserByUsername(expected.getUsername());
+        UserDetails actual = this.userService.loadUserByUsername(expected.getUsername());
 
         assertNotNull(actual);
         assertEquals("Response Username: ", actual.getUsername(), expected.getUsername());
@@ -156,7 +155,7 @@ public class UserServiceTest {
     void loadUserByUsername_NonExistentUser_ShouldThrowsException() {
         when(mockUserRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("testuser"));
+        RuntimeException exception = assertThrows(UsernameNotFoundException.class, () -> this.userService.loadUserByUsername("testuser"));
         assertNotNull(exception.getMessage());
 
         verify(mockUserRepository).findByUsernameOrEmail(anyString(), anyString());
